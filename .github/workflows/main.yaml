@@ -41,8 +41,9 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            sudo dnf install -y java-21-amazon-corretto
+            sudo dnf install -y java-21-amazon-corretto-headless procps
 
             pkill -f 'java -jar' || true
 
-            nohup java -jar ~/app/*.jar > app.log 2>&1 &
+            nohup java -jar ~/app/*.jar > ~/app/app.log 2>&1 &
+      
