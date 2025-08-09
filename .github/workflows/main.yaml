@@ -21,6 +21,9 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Set execute permission on gradlew
+        run: chmod +x ./gradlew
+
       # 3. Gradle bilan build qilish
       - name: Build with Gradle
         run: ./gradlew clean build -x test
