@@ -3,36 +3,37 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main  # faqat main branch'ga push bo‘lsa ishga tushadi
+      - main  # Triggers only on push to the main branch
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Kodni olish
+      # 1. Check out the code from the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Java o‘rnatish
+      # 2. Set up Java Development Kit (JDK)
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: 21
+          distribution: 'temurin'
+          java-version: '21'
 
+      # 3. Make the Gradle wrapper executable
       - name: Set execute permission on gradlew
         run: chmod +x ./gradlew
 
-      # 3. Gradle bilan build qilish
+      # 4. Build the project with Gradle, skipping tests
       - name: Build with Gradle
         run: ./gradlew clean build -x test
 
-      # 4. Build natijasini tekshirish
+      # 5. Verify the build output
       - name: Check JAR file
         run: ls -la build/libs
 
-      # 5. Serverga JAR ni yuklash
+      # 6. Upload the JAR file to the EC2 server
       - name: Upload JAR to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -41,8 +42,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "build/libs/*.jar"
           target: "/home/${{ secrets.SERVER_USER }}/app"
+          strip_components: 2 # Removes 'build/libs' from the path
 
-      # 6. Serverda ishga tushirish
+      # 7. Execute deployment script on the EC2 server
       - name: Run app on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -50,16 +52,34 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            mkdir -p /home/${{ secrets.SERVER_USER }}/app
+            # Define the application directory
+            APP_DIR="/home/${{ secrets.SERVER_USER }}/app"
+            mkdir -p $APP_DIR
+            
+            # Install necessary packages if they are not already present
             sudo dnf install -y java-21-amazon-corretto-headless procps
 
-            # Eski jar jarayonini o‘ldirish
-            pkill -f 'java -jar' || true
-            sleep 1
+            # Find and kill the old running application process safely
+            # This is safer than 'pkill' as it targets the specific JAR
+            PID=$(ps -f | grep "java -jar $APP_DIR" | grep -v grep | awk '{print $2}')
+            if [ -n "$PID" ]; then
+              echo "Stopping old process with PID: $PID"
+              kill -15 $PID # Send a termination signal
+              sleep 5      # Wait for graceful shutdown
+            else
+              echo "No old process found. Skipping."
+            fi
 
-            # Yangi jar ishga tushirish (session’dan mustaqil qilish)
-            nohup java -jar /home/${{ secrets.SERVER_USER }}/app/*.jar > /home/${{ secrets.SERVER_USER }}/app/app.log 2>&1 & disown
+            # Navigate to the application directory
+            cd $APP_DIR
 
-            echo "✅ Application started"
-            ps aux | grep -i java
-      
+            # Start the new application in the background using nohup
+            # This ensures the process keeps running after the SSH session closes
+            nohup java -jar *.jar > app.log 2>&1 &
+
+            echo "✅ Deployment script finished. Application is starting."
+            sleep 5 # Give the app a moment to initialize
+
+            # Check for the running Java process to confirm it started
+            echo "Current Java processes:"
+            ps aux | grep "[j]ava -jar" || echo "No Java process detected yet. Check logs at $APP_DIR/app.log"
