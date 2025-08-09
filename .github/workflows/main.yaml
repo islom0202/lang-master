@@ -96,7 +96,7 @@ jobs:
             ps aux | grep "[j]ava -jar" || echo "ERROR: Java process not found!"
 
             echo "--- Checking application health on localhost:8081 ---"
-            curl -f http://localhost:8081 || echo "ERROR: Application not responding on port 8080. Check app.log for errors."
+            curl -f http://localhost:8081 || echo "ERROR: Application not responding on port 8081. Check app.log for errors."
         env:
           SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USER }}
