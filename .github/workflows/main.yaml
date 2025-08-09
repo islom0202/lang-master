@@ -40,10 +40,10 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          script_stop: false
           script: |
             sudo dnf install -y java-21-amazon-corretto-headless procps
-
             pkill -f 'java -jar' || true
-
             nohup java -jar ~/app/*.jar > ~/app/app.log 2>&1 &
+      
       
