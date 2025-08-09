@@ -70,34 +70,34 @@ jobs:
             echo "Found executable JAR: $EXECUTABLE_JAR"
 
             # Find and kill the old running application process safely
-            PID=$(ps -f | grep "java -jar $EXECUTABLE_JAR" | grep -v grep | awk '{print $2}')
+            PID=$(ps -f | grep "$EXECUTABLE_JAR" | grep -v grep | awk '{print $2}')
             if [ -n "$PID" ]; then
               echo "Stopping old process with PID: $PID"
               kill -15 $PID
-              # Wait until the process is actually stopped
               while ps -p $PID > /dev/null; do sleep 1; done
               echo "Process stopped."
             else
               echo "No old process found. Skipping."
             fi
 
-            # Start the new application in the background and disown it
+            # Start the new application. Spring Boot will automatically use the
+            # SPRING_DATASOURCE_* environment variables we passed in.
             echo "Starting new application: $EXECUTABLE_JAR"
             nohup java -jar $EXECUTABLE_JAR > $APP_DIR/app.log 2>&1 & disown
 
             echo "✅ Deployment script finished. Waiting for application to start..."
-            sleep 15 # Give the app time to initialize
+            sleep 15
 
             # --- DIAGNOSTICS ---
-            # 1. Check the application's own log file for errors
             echo "--- Displaying application log (app.log) ---"
             cat $APP_DIR/app.log
 
-            # 2. Check if the process is running on the server
             echo "--- Checking for running Java process ---"
             ps aux | grep "[j]ava -jar" || echo "ERROR: Java process not found!"
 
-            # 3. Check if the application is responding locally on its port
-            #    (Assuming port 8080, change if your app uses a different one)
-            echo "--- Checking application health on localhost:8080 ---"
-            curl -f http://localhost:8080 || echo "ERROR: Application not responding on port 8080. Check app.log for errors."
+            echo "--- Checking application health on localhost:8081 ---"
+            curl -f http://localhost:8081 || echo "ERROR: Application not responding on port 8080. Check app.log for errors."
+        env:
+          SPRING_DATASOURCE_URL: ${{ secrets.DB_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.DB_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DB_PASSWORD }}
