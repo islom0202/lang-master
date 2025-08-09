@@ -40,10 +40,30 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
           script_stop: false
+          command_timeout: 20m
           script: |
-            sudo dnf install -y java-21-amazon-corretto-headless procps
-            pkill -f 'java -jar' || true
-            nohup java -jar ~/app/*.jar > ~/app/app.log 2>&1 &
-      
-      
+              set -e
+              
+              echo "Whoami: $(whoami)"
+              echo "Listing ~/app before:"
+              ls -la ~/app || mkdir -p ~/app
+              
+              sudo dnf install -y java-21-amazon-corretto-headless procps || true
+              
+              pkill -f 'java -jar' || true
+              sleep 1
+              
+              echo "Files in ~/app:"
+              ls -la ~/app || true
+              
+              nohup java -jar ~/app/*.jar > ~/app/app.log 2>&1 & disown || true
+              
+              sleep 2
+              echo "Java processes:"
+              ps aux | grep -i java || true
+              echo "Last lines of app log:"
+              tail -n 50 ~/app/app.log || true
+              
+              exit 0
