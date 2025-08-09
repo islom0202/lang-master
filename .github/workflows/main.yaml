@@ -19,7 +19,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Build with Gradle
+      - name: Build app (without tests)
         run: ./gradlew clean build -x test
 
       - name: Copy JAR to server
