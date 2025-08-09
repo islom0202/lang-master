@@ -53,12 +53,13 @@ jobs:
             mkdir -p /home/${{ secrets.SERVER_USER }}/app
             sudo dnf install -y java-21-amazon-corretto-headless procps
 
-            # Eski jar jarayonini to‘xtatish
+            # Eski jar jarayonini o‘ldirish
             pkill -f 'java -jar' || true
             sleep 1
 
-            # Yangi jar ishga tushirish
-            nohup java -jar /home/${{ secrets.SERVER_USER }}/app/*.jar > /home/${{ secrets.SERVER_USER }}/app/app.log 2>&1 &
+            # Yangi jar ishga tushirish (session’dan mustaqil qilish)
+            nohup java -jar /home/${{ secrets.SERVER_USER }}/app/*.jar > /home/${{ secrets.SERVER_USER }}/app/app.log 2>&1 & disown
 
             echo "✅ Application started"
             ps aux | grep -i java
+      
