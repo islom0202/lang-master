@@ -19,6 +19,9 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Set execute permission on gradlew
+        run: chmod +x ./gradlew
+
       - name: Build app (without tests)
         run: ./gradlew clean build -x test
 
