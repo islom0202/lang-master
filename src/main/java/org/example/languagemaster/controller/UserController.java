@@ -51,6 +51,4 @@ public class UserController {
           @RequestParam Long userId){
     return userService.userProgress(userId);
   }
-
-
 }
