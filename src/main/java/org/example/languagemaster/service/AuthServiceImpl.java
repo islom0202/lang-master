@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static org.example.languagemaster.Util.generateCode;
@@ -62,10 +63,19 @@ public class AuthServiceImpl implements AuthService {
   public ResponseEntity<Response> signUp(SignUpRequest request) {
     String key = request.email();
     String code = generateCode();
-    try {
+    if (userRepository.existsByEmail(request.email())){
+      String otp = cache.get(USER_TABLE, key, new TypeReference<String>() {});
+      if (Objects.isNull(otp)) {
+        email.sendConfirmationCode(request.email(), code);
+        cache.set(USER_TABLE, key, code, 2L, TimeUnit.MINUTES);
+        return ResponseEntity.ok(new Response("code_is_sent", true));
+      }
+      return ResponseEntity.ok(new Response("code_already_sent", false));
+    }
+      try {
       userRepository.save(buildUserEntity(request));
       email.sendConfirmationCode(request.email(), code);
-      cache.set(USER_TABLE, key, code, 1L, TimeUnit.MINUTES);
+      cache.set(USER_TABLE, key, code, 2L, TimeUnit.MINUTES);
       return ResponseEntity.ok(new Response("code_is_sent", true));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
