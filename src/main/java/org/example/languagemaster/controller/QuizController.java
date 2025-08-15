@@ -3,6 +3,7 @@ package org.example.languagemaster.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.example.languagemaster.dto.AnswerQuizReq;
+import org.example.languagemaster.dto.GrammarQuizeRes;
 import org.example.languagemaster.entity.Quizzes;
 import org.example.languagemaster.entity.enums.SectionType;
 import org.example.languagemaster.service.QuizService;
@@ -40,5 +41,12 @@ public class QuizController {
     @PostMapping("/grammar")
     public void answerGrammarQuiz(@RequestBody AnswerQuizReq req){
         quizService.answerGrammarQuiz(req);
+    }
+
+    @GetMapping("/grammar-result")
+    public ResponseEntity<GrammarQuizeRes> getResult(
+            @RequestParam Long userId,
+            @RequestParam Long grammarTopiId){
+        return quizService.getGrammarQuizeResult(userId, grammarTopiId);
     }
 }

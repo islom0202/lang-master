@@ -1,0 +1,45 @@
+package org.example.languagemaster.dto.mappers;
+
+import lombok.RequiredArgsConstructor;
+import org.example.languagemaster.dto.GrammarQuizeRes;
+import org.example.languagemaster.entity.GrammarTopics;
+import org.example.languagemaster.entity.Quizzes;
+import org.example.languagemaster.entity.QuizzesResults;
+import org.example.languagemaster.entity.Users;
+import org.example.languagemaster.entity.enums.SectionType;
+import org.example.languagemaster.repository.GrammarRepository;
+import org.example.languagemaster.repository.QuizRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutorService;
+
+@Component
+@RequiredArgsConstructor
+public class QuizzeMapper {
+  private final GrammarRepository grammarRepository;
+  @Autowired private ExecutorService virtualThreadExecutor;
+  private final UserProgressMapper progressMapper;
+
+  public GrammarQuizeRes mapToRes(Users user, Long topicId, int countCorrects) {
+    GrammarTopics topic =
+        grammarRepository
+            .findById(topicId)
+            .orElseThrow(() -> new NoSuchElementException("topic_not_found"));
+    int totalScore = topic.getScore() + countCorrects;
+
+    virtualThreadExecutor.submit(()->{
+      progressMapper.logProgress(user, topic, totalScore, SectionType.GRAMMAR_AND_QUIZ);
+    });
+
+    return GrammarQuizeRes.builder()
+        .topicId(topicId)
+        .firstname(user.getFirstname())
+        .lastname(user.getLastname())
+        .correctCount(countCorrects)
+        .topicName(topic.getTitle())
+        .gainedScore(totalScore) /* har bir savol 1 ball dan va togri savollar soni testdan olingan ball dir*/
+        .build();
+  }
+}

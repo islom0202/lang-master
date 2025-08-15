@@ -34,7 +34,7 @@ public class QuizzesResults implements Serializable {
     @ElementCollection
     private List<String> actualAnswers;
     @Column
-    private boolean isCorrect;
+    private Boolean isCorrect;
     @JoinColumn
     private LocalDateTime createdAt;
     @JoinColumn

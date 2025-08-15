@@ -54,7 +54,7 @@ public class GrammarServiceImpl implements GrammarService {
         grammarRepository
             .findById(topicId)
             .orElseThrow(() -> new NoSuchElementException(GRAMMAR_TOPIC_NOT_FOUND.code));
-    userProgress.save(progressMapper.buildProgress(user, topic));
+    userProgress.save(progressMapper.buildProgress(user, topic, SectionType.GRAMMAR));
     return ResponseEntity.ok(new Response("progress_logged", true));
   }
 

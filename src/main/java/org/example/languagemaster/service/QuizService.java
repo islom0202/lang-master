@@ -1,6 +1,7 @@
 package org.example.languagemaster.service;
 
 import org.example.languagemaster.dto.AnswerQuizReq;
+import org.example.languagemaster.dto.GrammarQuizeRes;
 import org.example.languagemaster.entity.Quizzes;
 import org.springframework.http.ResponseEntity;
 
@@ -10,4 +11,6 @@ public interface QuizService {
     ResponseEntity<List<Quizzes>> quizzes(Long topicId, String sectionType);
 
     void answerGrammarQuiz(AnswerQuizReq req);
+
+    ResponseEntity<GrammarQuizeRes> getGrammarQuizeResult(Long userId, Long grammarTopiId);
 }

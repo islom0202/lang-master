@@ -11,6 +11,7 @@ import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.UserProfileRes;
 import org.example.languagemaster.dto.UserProgressRes;
 import org.example.languagemaster.dto.mappers.UserMapper;
+import org.example.languagemaster.entity.Levels;
 import org.example.languagemaster.entity.Users;
 import org.example.languagemaster.exceptionHandler.ApplicationException;
 import org.example.languagemaster.repository.UserProgressRepository;
@@ -69,10 +70,24 @@ public class UserServiceImpl implements UserService {
   @Override
   public ResponseEntity<List<UserProgressRes>> userProgress(Long userId) {
     return ResponseEntity.ok(
-        progressRepository
-            .findAllByUsers_Id(userId)
-            .stream()
+        progressRepository.findAllByUsers_Id(userId).stream()
             .map(userMapper::mapToUserProgressRes)
             .toList());
+  }
+
+  @Override
+  public ResponseEntity<Response> levelUp(Long userId, Levels nextLevel) {
+    return userRepository
+        .findById(userId)
+        .map(
+            user -> {
+              user.setLangLevel(nextLevel);
+              userRepository.save(user);
+              return ResponseEntity.ok(new Response("updated", true));
+            })
+        .orElseGet(
+            () ->
+                ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new Response(USER_NOT_FOUND.getCode(), false)));
   }
 }
