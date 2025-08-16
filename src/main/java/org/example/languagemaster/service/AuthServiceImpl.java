@@ -62,30 +62,41 @@ public class AuthServiceImpl implements AuthService {
   @Transactional
   public ResponseEntity<Response> signUp(SignUpRequest request) {
     String key = request.email();
-    String code = generateCode();
-    if (userRepository.existsByEmail(request.email())){
-      String otp = cache.get(USER_TABLE, key, new TypeReference<String>() {});
-      if (Objects.isNull(otp)) {
-        email.sendConfirmationCode(request.email(), code);
-        cache.set(USER_TABLE, key, code, 2L, TimeUnit.MINUTES);
-        return ResponseEntity.ok(new Response("code_is_sent", true));
-      }
-      return ResponseEntity.ok(new Response("code_already_sent", false));
+
+    ResponseEntity<Response> existCheck = checkUserIfExist(request.email());
+    if (existCheck != null) {
+      return existCheck;
     }
-      try {
+
+    String code = generateCode();
+    try {
       userRepository.save(buildUserEntity(request));
       email.sendConfirmationCode(request.email(), code);
       cache.set(USER_TABLE, key, code, 2L, TimeUnit.MINUTES);
       return ResponseEntity.ok(new Response("code_is_sent", true));
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body(new Response("signup_failed: " + e.getMessage(), false));
+              .body(new Response("signup_failed: " + e.getMessage(), false));
     }
   }
 
+  private ResponseEntity<Response> checkUserIfExist(String userEmail) {
+    String code = generateCode();
+
+    if (userRepository.existsByEmail(userEmail) && userRepository.isVerified(userEmail)) {
+      String otp = cache.get(USER_TABLE, userEmail, new TypeReference<String>() {});
+      if (Objects.isNull(otp)) {
+        email.sendConfirmationCode(userEmail, code);
+        cache.set(USER_TABLE, userEmail, code, 2L, TimeUnit.MINUTES);
+        return ResponseEntity.ok(new Response("code_is_sent", true));
+      }
+      return ResponseEntity.ok(new Response("code_already_sent", false));
+    }
+    return null;
+  }
+
   private Users buildUserEntity(SignUpRequest request) {
-    Levels level = levelRepository.findById(request.levelId())
-            .orElseThrow();
+    Levels level = levelRepository.findById(request.levelId()).orElseThrow();
     return Users.builder()
         .firstname(request.firstname())
         .lastname(request.lastname())
@@ -134,8 +145,10 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public ResponseEntity<Response> resetPassword(String email, String newPassword) {
-    Users user = userRepository.findByEmail(email)
-            .orElseThrow(()-> new NoSuchElementException(USER_NOT_FOUND.getCode()));
+    Users user =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getCode()));
     user.setPassword(passwordEncoder.encode(newPassword));
     userRepository.save(user);
     return ResponseEntity.ok(new Response("new_password_set", true));

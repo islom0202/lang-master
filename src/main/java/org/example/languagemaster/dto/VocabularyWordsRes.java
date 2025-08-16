@@ -23,7 +23,7 @@ public class VocabularyWordsRes {
     private String translation;
     private String definition;
     private String example;
-    private String levels;
+    private String level;
     private String audioUrl;
     private int score;
     private LocalDateTime createdAt;

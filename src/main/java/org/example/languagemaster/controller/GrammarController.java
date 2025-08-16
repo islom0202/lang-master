@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.example.languagemaster.Response;
+import org.example.languagemaster.dto.GrammarReq;
 import org.example.languagemaster.dto.GrammarRes;
 import org.example.languagemaster.entity.Levels;
 import org.example.languagemaster.service.GrammarService;
@@ -40,14 +41,21 @@ public class GrammarController {
             summary = "Get all grammar lessons of a user",
             description = "Returns a list of all grammar lessons of a user")
     public ResponseEntity<List<GrammarRes>> myLessons(
-            @RequestParam Long userId){
-        return grammarService.myLessons(userId);
+            @RequestParam Long userId,
+            @RequestParam Long levelId){
+        return grammarService.myLessons(userId, levelId);
     }
 
-    @PostMapping("/end-lesson")
+    @PostMapping("/end-lesson")   /*birinchi darsni korib testni ishlab keyingi dars uchun end lesson ni bosadi*/
     public ResponseEntity<Response> endLesson(
             @RequestParam Long userId,
             @RequestParam Long topicId){
         return grammarService.endLesson(userId, topicId);
+    }
+
+    @PostMapping("/add-list")
+    public ResponseEntity<Response> addList(
+            @RequestBody List<GrammarReq> request){
+        return grammarService.addList(request);
     }
 }

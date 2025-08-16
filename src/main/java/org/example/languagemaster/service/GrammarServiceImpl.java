@@ -1,13 +1,14 @@
 package org.example.languagemaster.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.languagemaster.Response;
+import org.example.languagemaster.dto.GrammarReq;
 import org.example.languagemaster.dto.GrammarRes;
 import org.example.languagemaster.dto.mappers.GrammarMapper;
 import org.example.languagemaster.dto.mappers.UserProgressMapper;
 import org.example.languagemaster.entity.GrammarTopics;
 import org.example.languagemaster.entity.Levels;
-import org.example.languagemaster.entity.UserProgress;
 import org.example.languagemaster.entity.Users;
 import org.example.languagemaster.entity.enums.SectionType;
 import org.example.languagemaster.repository.GrammarRepository;
@@ -17,7 +18,6 @@ import org.example.languagemaster.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.example.languagemaster.constraint.ApplicationMessages.GRAMMAR_TOPIC_NOT_FOUND;
@@ -59,28 +59,43 @@ public class GrammarServiceImpl implements GrammarService {
   }
 
   @Override
-  public ResponseEntity<List<GrammarRes>> myLessons(Long userId) {
-    List<GrammarTopics> topics = grammarRepository.findAllByOrderByIdAsc();
-    Set<Long> endedTopicsIds = new HashSet<>(userProgress.endedTopicsId(userId, SectionType.GRAMMAR.toString()));
+  @Transactional
+  public ResponseEntity<List<GrammarRes>> myLessons(Long userId, Long levelId) {
+    List<GrammarTopics> topics = grammarRepository.findAllByLevels_IdOrderByIdAsc(levelId);
+    Set<Long> endedTopicsIds = getEndedTopicIds(userId, SectionType.GRAMMAR.toString());
 
-    List<GrammarRes> response = topics.stream()
-            .map(topic -> GrammarRes.builder()
-                    .id(topic.getId())
-                    .title(topic.getTitle())
-                    .description(topic.getDescription())
-                    .example(topic.getExample())
-                    .levels(topic.getLevels())
-                    .assignment(topic.getAssignment())
-                    .rules(topic.getRules())
-                    .ended(endedTopicsIds.contains(topic.getId()))
-                    .score(topic.getScore())
-                    .videoUrl(topic.getVideoUrl())
-                    .createdAt(topic.getCreatedAt())
-                    .build()
-            )
+    List<GrammarRes> response =
+        topics.stream()
+            .map(
+                topic ->
+                    GrammarRes.builder()
+                        .id(topic.getId())
+                        .title(topic.getTitle())
+                        .description(topic.getDescription())
+                        .example(topic.getExample())
+                        .levels(topic.getLevels())
+                        .assignment(topic.getAssignment())
+                        .rules(topic.getRules())
+                        .ended(endedTopicsIds.contains(topic.getId()))
+                        .score(topic.getScore())
+                        .videoUrl(topic.getVideoUrl())
+                        .createdAt(topic.getCreatedAt())
+                        .build())
             .toList();
     return ResponseEntity.ok(response);
   }
 
+  private Set<Long> getEndedTopicIds(Long userId, String sectionType) {
+    return new HashSet<>(
+        Optional.ofNullable(userProgress.endedTopicsId(userId, sectionType))
+            .orElse(Collections.emptyList()));
+  }
 
+  @Override
+  public ResponseEntity<Response> addList(List<GrammarReq> request) {
+    List<GrammarTopics> topics = request.stream().map(grammarMapper::mapToEntity).toList();
+
+    grammarRepository.saveAll(topics);
+    return ResponseEntity.ok(new Response("saved", true));
+  }
 }

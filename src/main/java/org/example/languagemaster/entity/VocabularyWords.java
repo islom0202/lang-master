@@ -1,7 +1,10 @@
 package org.example.languagemaster.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -9,6 +12,9 @@ import java.time.LocalDateTime;
 @Entity
 @Table
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class VocabularyWords implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,13 +26,14 @@ public class VocabularyWords implements Serializable {
     private String word;
     @Column
     private String translation;
-    @Column
+    @Column(columnDefinition = "TEXT")
+    @Lob
     private String definition;
-    @Column
+    @Column(columnDefinition = "TEXT")
+    @Lob
     private String example;
-    @ManyToOne
-    @JoinColumn(name = "level_id")
-    private Levels levels;
+    @Column
+    private String level;
     @Column
     private String audioUrl;
     @Column

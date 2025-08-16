@@ -2,16 +2,16 @@ package org.example.languagemaster.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
+import org.example.languagemaster.Response;
+import org.example.languagemaster.dto.VocabularyGroupsReq;
 import org.example.languagemaster.dto.VocabularyGroupsRes;
 import org.example.languagemaster.dto.VocabularyWordsRes;
+import org.example.languagemaster.dto.WordsReq;
 import org.example.languagemaster.entity.VocabularyGroups;
 import org.example.languagemaster.service.VocabularyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +37,18 @@ public class VocabularyController {
     public ResponseEntity<List<VocabularyWordsRes>> wordsByCategory(
             @RequestParam Long groupId){
         return vocabularyService.wordsByCategory(groupId);
+    }
+
+    @PostMapping("/add-categories")
+    public ResponseEntity<Response> addCategories(
+            @RequestBody List<VocabularyGroupsReq> categories){
+        return vocabularyService.addCategories(categories);
+    }
+
+  @PostMapping("/add-words/{categoryId}")
+  public ResponseEntity<Response> addWords(
+          @PathVariable("categoryId") Long categoryId,
+          @RequestBody List<WordsReq> words) {
+        return vocabularyService.addWords(categoryId, words);
     }
 }

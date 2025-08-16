@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface GrammarRepository extends JpaRepository<GrammarTopics, Long> {
     List<GrammarTopics> findAllByOrderByIdAsc();
+    List<GrammarTopics> findAllByLevels_IdOrderByIdAsc(Long levelId);
+
 }
