@@ -1,7 +1,10 @@
 package org.example.languagemaster.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.example.languagemaster.entity.enums.QuestionType;
 import org.example.languagemaster.entity.enums.SectionType;
 
@@ -11,6 +14,9 @@ import java.util.List;
 @Entity
 @Table
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Quizzes implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +36,9 @@ public class Quizzes implements Serializable {
   @Column
   @Enumerated(EnumType.STRING)
   private QuestionType type;
+
+  @JoinColumn
+  private int score;
 
   @Column @ElementCollection private List<String> correctAnswers;
   @ElementCollection @Column private List<String> otherAnswers;

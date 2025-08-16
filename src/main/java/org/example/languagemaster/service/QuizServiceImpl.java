@@ -1,8 +1,5 @@
 package org.example.languagemaster.service;
 
-import static org.example.languagemaster.constraint.ApplicationMessages.QUIZ_NOT_FOUND;
-import static org.example.languagemaster.constraint.ApplicationMessages.USER_NOT_FOUND;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -10,24 +7,32 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
+import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.AnswerQuizReq;
 import org.example.languagemaster.dto.GrammarQuizeRes;
+import org.example.languagemaster.dto.QuizReq;
+import org.example.languagemaster.dto.QuizzesRes;
 import org.example.languagemaster.dto.mappers.QuizzeMapper;
 import org.example.languagemaster.entity.Quizzes;
 import org.example.languagemaster.entity.QuizzesResults;
 import org.example.languagemaster.entity.Users;
+import org.example.languagemaster.entity.enums.SectionType;
 import org.example.languagemaster.exceptionHandler.ApplicationException;
+import org.example.languagemaster.repository.GrammarRepository;
 import org.example.languagemaster.repository.QuizRepository;
 import org.example.languagemaster.repository.QuizzesResultsRepository;
 import org.example.languagemaster.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import static org.example.languagemaster.constraint.ApplicationMessages.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +43,45 @@ public class QuizServiceImpl implements QuizService {
   private final RedisCacheService cache;
   @Autowired private ExecutorService virtualThreadExecutor;
   private final QuizzeMapper quizzeMapper;
+  private final GrammarRepository grammarRepository;
   private static final String QUIZE_TEMP_TABLE = "quiz_temp_table";
 
   @Override
-  public ResponseEntity<List<Quizzes>> quizzes(Long topicId, String sectionType) {
-    List<Quizzes> quizzes = quizRepository.allQuizByTopicIdAndType(topicId, sectionType);
+  public ResponseEntity<List<QuizzesRes>> quizzes(String email, Long topicId, String sectionType) {
+    Set<Long> endedQuizIds = cache.getSet(QUIZE_TEMP_TABLE, email, new TypeReference<>() {});
+
+    List<QuizzesRes> quizzes =
+        endedQuizIds.isEmpty()
+            ? mapToResList(
+                quizRepository.allQuizByTopicIdAndType(topicId, sectionType), Function.identity())
+            : mergeQuestions(email, endedQuizIds, topicId, sectionType);
+
     return ResponseEntity.ok(quizzes);
+  }
+
+  private List<QuizzesRes> mergeQuestions(
+      String email, Set<Long> endedQuizIds, Long topicId, String sectionType) {
+
+    Long userId =
+        userRepository
+            .findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND.getCode()))
+            .getId();
+
+    List<QuizzesRes> selected =
+        mapToResList(
+            quizzesResults.getAllByUserIdAndQuizzeId(userId, endedQuizIds),
+            QuizzesResults::getQuizzes);
+
+    List<QuizzesRes> nonSelected =
+        mapToResList(
+            quizRepository.allQuizByTopicIdAndType(topicId, sectionType), Function.identity());
+
+    return Stream.concat(selected.stream(), nonSelected.stream()).collect(Collectors.toList());
+  }
+
+  private <T> List<QuizzesRes> mapToResList(List<T> entities, Function<T, Quizzes> extractor) {
+    return entities.stream().map(extractor).map(quizzeMapper::mapToQuizzesRes).toList();
   }
 
   @Override
@@ -79,19 +117,36 @@ public class QuizServiceImpl implements QuizService {
     return ResponseEntity.ok(checkForCorrectAndIncorrects(user, selectedQuizId, grammarTopiId));
   }
 
+  @Override
+  public ResponseEntity<Response> addGrammarQuiz(Long topicId, Long score, List<QuizReq> req) {
+    return buildQuiz(topicId, score, req, SectionType.GRAMMAR);
+  }
+
+  @Override
+  public ResponseEntity<Response> addVocabQuiz(Long groupId, Long score, List<QuizReq> req) {
+    return buildQuiz(groupId, score, req, SectionType.GRAMMAR);
+  }
+
+  private ResponseEntity<Response> buildQuiz(
+      Long id, Long score, List<QuizReq> req, SectionType type) {
+    List<Quizzes> quizzes =
+        req.stream()
+            .map(v1 -> quizzeMapper.mapToGrammarQuiz(id, score.intValue(), v1, type))
+            .toList();
+    quizRepository.saveAll(quizzes);
+    return ResponseEntity.ok(new Response("saved", true));
+  }
+
   private GrammarQuizeRes checkForCorrectAndIncorrects(
-          Users user, Set<Long> selectedQuizId, Long grammarTopicId) {
+      Users user, Set<Long> selectedQuizId, Long grammarTopicId) {
 
     List<QuizzesResults> results =
-            quizzesResults.getAllByUserIdAndQuizzeId(user.getId(), selectedQuizId);
+        quizzesResults.getAllByUserIdAndQuizzeId(user.getId(), selectedQuizId);
 
-    long countCorrects = results.stream()
-            .filter(QuizzesResults::getIsCorrect)
-            .count();
+    long countCorrects = results.stream().filter(QuizzesResults::getIsCorrect).count();
 
     return quizzeMapper.mapToRes(user, grammarTopicId, (int) countCorrects);
   }
-
 
   private void setAnswer(Users user, Quizzes quiz, AnswerQuizReq req, boolean isCorrect) {
     quizzesResults.save(

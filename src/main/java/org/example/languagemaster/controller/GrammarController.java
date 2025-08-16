@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.GrammarReq;
 import org.example.languagemaster.dto.GrammarRes;
+import org.example.languagemaster.dto.TopicRes;
 import org.example.languagemaster.entity.Levels;
 import org.example.languagemaster.service.GrammarService;
 import org.springframework.http.ResponseEntity;
@@ -58,4 +59,10 @@ public class GrammarController {
             @RequestBody List<GrammarReq> request){
         return grammarService.addList(request);
     }
+
+    @GetMapping("/topic-list")
+    public ResponseEntity<List<TopicRes>> topicList(){
+        return grammarService.topicList();
+    }
+
 }

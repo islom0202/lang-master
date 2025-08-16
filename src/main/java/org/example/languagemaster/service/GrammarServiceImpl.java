@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.GrammarReq;
 import org.example.languagemaster.dto.GrammarRes;
+import org.example.languagemaster.dto.TopicRes;
 import org.example.languagemaster.dto.mappers.GrammarMapper;
 import org.example.languagemaster.dto.mappers.UserProgressMapper;
 import org.example.languagemaster.entity.GrammarTopics;
@@ -97,5 +98,10 @@ public class GrammarServiceImpl implements GrammarService {
 
     grammarRepository.saveAll(topics);
     return ResponseEntity.ok(new Response("saved", true));
+  }
+
+  @Override
+  public ResponseEntity<List<TopicRes>> topicList() {
+    return ResponseEntity.ok(grammarRepository.getTopicList());
   }
 }

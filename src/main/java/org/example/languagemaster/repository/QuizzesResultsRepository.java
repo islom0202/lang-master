@@ -21,5 +21,4 @@ public interface QuizzesResultsRepository extends JpaRepository<QuizzesResults, 
             @Param("userId") Long userId,
             @Param("topicId") Set<Long> quizzeIds
     );
-
 }
