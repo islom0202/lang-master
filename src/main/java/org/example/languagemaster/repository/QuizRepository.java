@@ -21,5 +21,5 @@ public interface QuizRepository extends JpaRepository<Quizzes, Long> {
             "select * from quizzes where section_id =:topicId and id not in (:ids)",
             nativeQuery = true)
     List<Quizzes> nonSelectedQuizzes(@Param("topicId") Long topicId,
-                                          @Param("ids") Set<Long> ids);
+                                          @Param("ids") List<Long> ids);
 }

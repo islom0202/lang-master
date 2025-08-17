@@ -19,6 +19,15 @@ public interface QuizzesResultsRepository extends JpaRepository<QuizzesResults, 
 """, nativeQuery = true)
     List<QuizzesResults> getAllByUserIdAndQuizzeId(
             @Param("userId") Long userId,
-            @Param("quizzeIds") Set<Long> quizzeIds
+            @Param("quizzeIds") List<Long> quizzeIds
     );
+
+    @Query(value = """
+            select quizze_id from quizzes_results
+            where quizze_id in (
+            select id from quizzes where section_id =:sectionId and section_type =:sectionType) and user_id =:userId;
+            """, nativeQuery = true)
+    List<Long> selectedQuizzes(@Param("sectionId") Long sectionId,
+                                         @Param("sectionType") String sectionType,
+                                         @Param("userId") Long userId);
 }

@@ -49,25 +49,21 @@ public class QuizServiceImpl implements QuizService {
 
   @Override
   @Transactional
-  public ResponseEntity<List<QuizzesRes>> quizzes(String email, Long topicId, String sectionType) {
-    Set<Long> endedQuizIds = cache.getSet(QUIZE_TEMP_TABLE, email, new TypeReference<Long>() {});
-
+  public ResponseEntity<List<QuizzesRes>> quizzes(Long userId, Long topicId, String sectionType) {
+    List<Long> selected = quizzesResults
+            .selectedQuizzes(topicId, sectionType, userId);
     List<QuizzesRes> quizzes =
-        endedQuizIds.isEmpty()
+        selected.isEmpty()
             ? mapToResList(
                 quizRepository.allQuizByTopicIdAndType(topicId, sectionType),
                 quizzeMapper::mapToQuizzesRes)
-            : mergeQuestions(email, endedQuizIds, topicId, sectionType);
+            : mergeQuestions(userId, selected, topicId, sectionType);
 
     return ResponseEntity.ok(quizzes);
   }
 
   private List<QuizzesRes> mergeQuestions(
-          String email, Set<Long> endedQuizIds, Long topicId, String sectionType) {
-
-    Long userId = userRepository.findByEmail(email)
-            .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND.getCode()))
-            .getId();
+          Long userId, List<Long> endedQuizIds, Long topicId, String sectionType) {
 
     List<QuizzesRes> selected = mapToResList(
             quizzesResults.getAllByUserIdAndQuizzeId(userId, endedQuizIds),
@@ -144,7 +140,7 @@ public class QuizServiceImpl implements QuizService {
       Users user, Set<Long> selectedQuizId, Long grammarTopicId) {
 
     List<QuizzesResults> results =
-        quizzesResults.getAllByUserIdAndQuizzeId(user.getId(), selectedQuizId);
+        quizzesResults.getAllByUserIdAndQuizzeId(user.getId(), selectedQuizId.stream().toList());
 
     int totalScore = results.stream()
             .filter(QuizzesResults::getIsCorrect)
@@ -167,7 +163,6 @@ public class QuizServiceImpl implements QuizService {
             .createdAt(LocalDateTime.now())
             .updatedAt(LocalDateTime.now())
             .build());
-    cache.addToSet(QUIZE_TEMP_TABLE, user.getEmail(), quiz.getId(), 17L, TimeUnit.MINUTES);
   }
 
   private boolean checkAnswers(Quizzes quiz, AnswerQuizReq req) {

@@ -28,10 +28,10 @@ public class QuizzesResults implements Serializable {
     @ManyToOne
     private Users users;
     @Column
-    @ElementCollection
+    @Convert(converter = StringListConverter.class)
     private List<String> userAnswers;
     @Column
-    @ElementCollection
+    @Convert(converter = StringListConverter.class)
     private List<String> actualAnswers;
     @Column
     private Boolean isCorrect;

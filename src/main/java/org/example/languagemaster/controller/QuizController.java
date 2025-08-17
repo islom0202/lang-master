@@ -29,8 +29,8 @@ public class QuizController {
             description = "Returns a list of all grammar quizzes available")
     public ResponseEntity<List<QuizzesRes>> grammarQuizzes(
             @RequestParam Long topicId,
-            @RequestParam String email){
-        return quizService.quizzes(email, topicId, SectionType.GRAMMAR.toString());
+            @RequestParam Long userId){
+        return quizService.quizzes(userId, topicId, SectionType.GRAMMAR.toString());
     }
 
     @GetMapping("/vocabulary")
@@ -39,8 +39,8 @@ public class QuizController {
             description = "Returns a list of all vocabulary quizzes available")
     public ResponseEntity<List<QuizzesRes>> vocabularyQuizzes(
             @RequestParam Long topicId,
-            @RequestParam String email){
-        return quizService.quizzes(email, topicId, SectionType.VOCABULARY.toString());
+            @RequestParam Long userId){
+        return quizService.quizzes(userId, topicId, SectionType.VOCABULARY.toString());
     }
 
     @PostMapping("/grammar")

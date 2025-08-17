@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 public interface QuizService {
-    ResponseEntity<List<QuizzesRes>> quizzes(String email, Long topicId, String sectionType);
+    ResponseEntity<List<QuizzesRes>> quizzes(Long userId, Long topicId, String sectionType);
 
     void answerGrammarQuiz(AnswerQuizReq req);
 
