@@ -5,13 +5,16 @@ import lombok.AllArgsConstructor;
 import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.UserProfileRes;
 import org.example.languagemaster.dto.UserProgressRes;
+import org.example.languagemaster.dto.UserRankingRes;
 import org.example.languagemaster.entity.UserProgress;
 import org.example.languagemaster.service.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -50,5 +53,22 @@ public class UserController {
   public ResponseEntity<List<UserProgressRes>> userProgress(
           @RequestParam Long userId){
     return userService.userProgress(userId);
+  }
+
+  @GetMapping("/ranking")
+  public ResponseEntity<Page<UserRankingRes>> userRanking(
+          @RequestParam LocalDate begin,
+          @RequestParam LocalDate end,
+          @RequestParam int page,
+          @RequestParam int size,
+          @RequestParam String orderField,
+          @RequestParam String orderType){
+    return userService.ranking(begin, end, orderField, orderType, page, size);
+  }
+
+  @GetMapping("/rank/{userId}")
+  public ResponseEntity<UserRankingRes> rank(
+          @PathVariable("userId") Long userId){
+    return userService.rankByUserId(userId);
   }
 }

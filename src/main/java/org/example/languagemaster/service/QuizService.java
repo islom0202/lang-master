@@ -20,4 +20,6 @@ public interface QuizService {
     ResponseEntity<Response> addGrammarQuiz(Long topicId, Long score, List<QuizReq> req);
 
     ResponseEntity<Response> addVocabQuiz(Long groupId, Long score, List<QuizReq> req);
+
+    void answerVocabQuiz(AnswerQuizReq req);
 }

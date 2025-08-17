@@ -84,21 +84,7 @@ public class QuizServiceImpl implements QuizService {
 
   @Override
   public void answerGrammarQuiz(AnswerQuizReq req) {
-    CompletableFuture<Quizzes> quizFuture = CompletableFuture.supplyAsync(
-            () -> quizRepository.findById(req.quizId())
-                    .orElseThrow(() -> new NoSuchElementException(QUIZ_NOT_FOUND.getCode())),
-            virtualThreadExecutor
-    );
-
-    CompletableFuture<Users> userFuture = CompletableFuture.supplyAsync(
-            () -> userRepository.findById(req.userId())
-                    .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getCode())),
-            virtualThreadExecutor
-    );
-
-      Quizzes quiz = quizFuture.join();
-      Users user = userFuture.join();
-      setAnswer(user, quiz, req, checkAnswers(quiz, req));
+    answerQuiz(req);
   }
 
   @Override
@@ -124,6 +110,29 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public ResponseEntity<Response> addVocabQuiz(Long groupId, Long score, List<QuizReq> req) {
     return buildQuiz(groupId, score, req, SectionType.GRAMMAR);
+  }
+
+  @Override
+  public void answerVocabQuiz(AnswerQuizReq req) {
+    answerQuiz(req);
+  }
+
+  private void answerQuiz(AnswerQuizReq req){
+    CompletableFuture<Quizzes> quizFuture = CompletableFuture.supplyAsync(
+            () -> quizRepository.findById(req.quizId())
+                    .orElseThrow(() -> new NoSuchElementException(QUIZ_NOT_FOUND.getCode())),
+            virtualThreadExecutor
+    );
+
+    CompletableFuture<Users> userFuture = CompletableFuture.supplyAsync(
+            () -> userRepository.findById(req.userId())
+                    .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getCode())),
+            virtualThreadExecutor
+    );
+
+    Quizzes quiz = quizFuture.join();
+    Users user = userFuture.join();
+    setAnswer(user, quiz, req, checkAnswers(quiz, req));
   }
 
   private ResponseEntity<Response> buildQuiz(

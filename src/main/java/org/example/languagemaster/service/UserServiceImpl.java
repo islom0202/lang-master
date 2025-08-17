@@ -4,18 +4,21 @@ import static org.example.languagemaster.Util.buildImageUrl;
 import static org.example.languagemaster.constraint.ApplicationMessages.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.UserProfileRes;
 import org.example.languagemaster.dto.UserProgressRes;
+import org.example.languagemaster.dto.UserRankingRes;
 import org.example.languagemaster.dto.mappers.UserMapper;
 import org.example.languagemaster.entity.Levels;
 import org.example.languagemaster.entity.Users;
 import org.example.languagemaster.exceptionHandler.ApplicationException;
 import org.example.languagemaster.repository.UserProgressRepository;
 import org.example.languagemaster.repository.UserRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -89,5 +92,16 @@ public class UserServiceImpl implements UserService {
             () ->
                 ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new Response(USER_NOT_FOUND.getCode(), false)));
+  }
+
+  @Override
+  public ResponseEntity<Page<UserRankingRes>> ranking(
+      LocalDate begin, LocalDate end, String orderField, String orderType, int page, int size) {
+    return null;
+  }
+
+  @Override
+  public ResponseEntity<UserRankingRes> rankByUserId(Long userId) {
+    return null;
   }
 }
