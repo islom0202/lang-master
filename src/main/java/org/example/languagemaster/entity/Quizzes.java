@@ -40,6 +40,6 @@ public class Quizzes implements Serializable {
   @JoinColumn
   private int score;
 
-  @Column @ElementCollection private List<String> correctAnswers;
-  @ElementCollection @Column private List<String> otherAnswers;
+  @Column @ElementCollection(fetch = FetchType.EAGER) private List<String> correctAnswers;
+  @Column @ElementCollection(fetch = FetchType.EAGER) private List<String> otherAnswers;
 }

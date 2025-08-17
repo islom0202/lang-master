@@ -40,7 +40,8 @@ public class RedisCacheService {
     try {
       String fullKey = tableName + "_" + key;
       String jsonData = objectMapper.writeValueAsString(data);
-      redisTemplate.opsForSet().add(key, jsonData);
+      redisTemplate.opsForSet().add(fullKey, jsonData);
+      redisTemplate.expire(fullKey, timeout, unit);
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to serialize object for Redis", e);
     }

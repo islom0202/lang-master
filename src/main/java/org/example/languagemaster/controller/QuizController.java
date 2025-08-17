@@ -44,11 +44,16 @@ public class QuizController {
     }
 
     @PostMapping("/grammar")
+    @Operation(
+            summary = "log user test answer")
     public void answerGrammarQuiz(@RequestBody AnswerQuizReq req){
         quizService.answerGrammarQuiz(req);
     }
 
     @GetMapping("/grammar-result")
+    @Operation(
+            summary = "Get quizzes result",
+            description = "Returns grammar quizzes results")
     public ResponseEntity<GrammarQuizeRes> getResult(
             @RequestParam Long userId,
             @RequestParam Long grammarTopiId){

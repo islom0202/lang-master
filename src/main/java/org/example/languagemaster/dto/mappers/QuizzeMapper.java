@@ -10,12 +10,10 @@ import org.example.languagemaster.entity.QuizzesResults;
 import org.example.languagemaster.entity.Users;
 import org.example.languagemaster.entity.enums.SectionType;
 import org.example.languagemaster.repository.GrammarRepository;
-import org.example.languagemaster.repository.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
 
@@ -26,12 +24,12 @@ public class QuizzeMapper {
   @Autowired private ExecutorService virtualThreadExecutor;
   private final UserProgressMapper progressMapper;
 
-  public GrammarQuizeRes mapToRes(Users user, Long topicId, int countCorrects) {
+  public GrammarQuizeRes mapToRes(Users user, Long topicId, int totalScore, int correctNum) {
     GrammarTopics topic =
         grammarRepository
             .findById(topicId)
             .orElseThrow(() -> new NoSuchElementException("topic_not_found"));
-    int totalScore = topic.getScore() + countCorrects;
+    int lastScore = topic.getScore() + totalScore;
 
     virtualThreadExecutor.submit(
         () -> {
@@ -42,23 +40,22 @@ public class QuizzeMapper {
         .topicId(topicId)
         .firstname(user.getFirstname())
         .lastname(user.getLastname())
-        .correctCount(countCorrects)
+        .correctCount(correctNum)
         .topicName(topic.getTitle())
-        .gainedScore(
-            totalScore) /* har bir savol 1 ball dan va togri savollar soni testdan olingan ball dir*/
+        .gainedScore(lastScore)
         .build();
   }
 
   public Quizzes mapToGrammarQuiz(Long topicId, Integer score, QuizReq req, SectionType type) {
     return Quizzes.builder()
-            .sectionId(topicId)
-            .score(score)
-            .sectionType(SectionType.GRAMMAR)
-            .type(req.getType())
-            .question(req.getQuestion())
-            .correctAnswers(req.getCorrectAnswers())
-            .otherAnswers(req.getOtherAnswers())
-            .build();
+        .sectionId(topicId)
+        .score(score)
+        .sectionType(SectionType.GRAMMAR)
+        .type(req.getType())
+        .question(req.getQuestion())
+        .correctAnswers(req.getCorrectAnswers())
+        .otherAnswers(req.getOtherAnswers())
+        .build();
   }
 
   public QuizzesRes mapToQuizzesRes(Quizzes quizzes) {
@@ -66,25 +63,27 @@ public class QuizzeMapper {
         .quizId(quizzes.getId())
         .question(quizzes.getQuestion())
         .sectionId(quizzes.getSectionId())
-            .sectionType(quizzes.getSectionType())
-            .score(quizzes.getScore())
-            .userAnswers(Collections.emptyList())
-            .correctAnswers(quizzes.getCorrectAnswers())
-            .otherAnswers(quizzes.getOtherAnswers())
-            .build();
+        .sectionType(quizzes.getSectionType())
+        .score(quizzes.getScore())
+        .userAnswers(Collections.emptyList())
+        .correctAnswers(quizzes.getCorrectAnswers())
+        .otherAnswers(quizzes.getOtherAnswers())
+        .type(quizzes.getType())
+        .build();
   }
 
   public QuizzesRes mapToQuizzesRes(QuizzesResults results) {
     Quizzes quizzes = results.getQuizzes();
     return QuizzesRes.builder()
-            .quizId(quizzes.getId())
-            .question(quizzes.getQuestion())
-            .sectionId(quizzes.getSectionId())
-            .sectionType(quizzes.getSectionType())
-            .score(quizzes.getScore())
-            .userAnswers(results.getUserAnswers())
-            .correctAnswers(quizzes.getCorrectAnswers())
-            .otherAnswers(quizzes.getOtherAnswers())
-            .build();
+        .quizId(quizzes.getId())
+        .question(quizzes.getQuestion())
+        .sectionId(quizzes.getSectionId())
+        .sectionType(quizzes.getSectionType())
+        .type(quizzes.getType())
+        .score(quizzes.getScore())
+        .userAnswers(results.getUserAnswers())
+        .correctAnswers(quizzes.getCorrectAnswers())
+        .otherAnswers(quizzes.getOtherAnswers())
+        .build();
   }
 }

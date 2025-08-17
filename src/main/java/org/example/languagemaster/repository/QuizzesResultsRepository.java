@@ -15,10 +15,10 @@ public interface QuizzesResultsRepository extends JpaRepository<QuizzesResults, 
     SELECT *
     FROM quizzes_results
     WHERE user_id = :userId
-      AND quizze_id IN (=:quizzeIds)
+      AND quizze_id IN (:quizzeIds)
 """, nativeQuery = true)
     List<QuizzesResults> getAllByUserIdAndQuizzeId(
             @Param("userId") Long userId,
-            @Param("topicId") Set<Long> quizzeIds
+            @Param("quizzeIds") Set<Long> quizzeIds
     );
 }

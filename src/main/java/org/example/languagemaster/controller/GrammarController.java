@@ -40,7 +40,7 @@ public class GrammarController {
     @GetMapping("/my-lessons")
     @Operation(
             summary = "Get all grammar lessons of a user",
-            description = "Returns a list of all grammar lessons of a user")
+            description = "Returns a list of all grammar lessons  of a user")
     public ResponseEntity<List<GrammarRes>> myLessons(
             @RequestParam Long userId,
             @RequestParam Long levelId){

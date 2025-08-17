@@ -1,6 +1,8 @@
 package org.example.languagemaster.repository;
 
 import java.util.List;
+import java.util.Set;
+
 import org.example.languagemaster.entity.Quizzes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -14,4 +16,10 @@ public interface QuizRepository extends JpaRepository<Quizzes, Long> {
     nativeQuery = true)
     List<Quizzes> allQuizByTopicIdAndType(@Param("topicId") Long topicId,
                                           @Param("type") String type);
+
+    @Query(value =
+            "select * from quizzes where section_id =:topicId and id not in (:ids)",
+            nativeQuery = true)
+    List<Quizzes> nonSelectedQuizzes(@Param("topicId") Long topicId,
+                                          @Param("ids") Set<Long> ids);
 }

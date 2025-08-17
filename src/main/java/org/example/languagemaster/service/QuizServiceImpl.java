@@ -1,10 +1,8 @@
 package org.example.languagemaster.service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -12,7 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.AnswerQuizReq;
 import org.example.languagemaster.dto.GrammarQuizeRes;
@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import static org.example.languagemaster.constraint.ApplicationMessages.*;
 
 @Service
+@Log
 @RequiredArgsConstructor
 public class QuizServiceImpl implements QuizService {
   private final QuizRepository quizRepository;
@@ -47,59 +48,61 @@ public class QuizServiceImpl implements QuizService {
   private static final String QUIZE_TEMP_TABLE = "quiz_temp_table";
 
   @Override
+  @Transactional
   public ResponseEntity<List<QuizzesRes>> quizzes(String email, Long topicId, String sectionType) {
-    Set<Long> endedQuizIds = cache.getSet(QUIZE_TEMP_TABLE, email, new TypeReference<>() {});
+    Set<Long> endedQuizIds = cache.getSet(QUIZE_TEMP_TABLE, email, new TypeReference<Long>() {});
 
     List<QuizzesRes> quizzes =
         endedQuizIds.isEmpty()
             ? mapToResList(
-                quizRepository.allQuizByTopicIdAndType(topicId, sectionType), Function.identity())
+                quizRepository.allQuizByTopicIdAndType(topicId, sectionType),
+                quizzeMapper::mapToQuizzesRes)
             : mergeQuestions(email, endedQuizIds, topicId, sectionType);
 
     return ResponseEntity.ok(quizzes);
   }
 
   private List<QuizzesRes> mergeQuestions(
-      String email, Set<Long> endedQuizIds, Long topicId, String sectionType) {
+          String email, Set<Long> endedQuizIds, Long topicId, String sectionType) {
 
-    Long userId =
-        userRepository
-            .findByEmail(email)
+    Long userId = userRepository.findByEmail(email)
             .orElseThrow(() -> new IllegalArgumentException(USER_NOT_FOUND.getCode()))
             .getId();
 
-    List<QuizzesRes> selected =
-        mapToResList(
+    List<QuizzesRes> selected = mapToResList(
             quizzesResults.getAllByUserIdAndQuizzeId(userId, endedQuizIds),
-            QuizzesResults::getQuizzes);
+            quizzeMapper::mapToQuizzesRes);
 
-    List<QuizzesRes> nonSelected =
-        mapToResList(
-            quizRepository.allQuizByTopicIdAndType(topicId, sectionType), Function.identity());
+    List<QuizzesRes> nonSelected = mapToResList(
+            quizRepository.nonSelectedQuizzes(topicId, endedQuizIds),
+            quizzeMapper::mapToQuizzesRes);
 
-    return Stream.concat(selected.stream(), nonSelected.stream()).collect(Collectors.toList());
+    return Stream.concat(selected.stream(), nonSelected.stream())
+            .sorted(Comparator.comparing(QuizzesRes::getQuizId))
+            .toList();
+
   }
-
-  private <T> List<QuizzesRes> mapToResList(List<T> entities, Function<T, Quizzes> extractor) {
-    return entities.stream().map(extractor).map(quizzeMapper::mapToQuizzesRes).toList();
+  private <T> List<QuizzesRes> mapToResList(List<T> entities, Function<T, QuizzesRes> mapper) {
+    return entities.stream().map(mapper).toList();
   }
 
   @Override
   public void answerGrammarQuiz(AnswerQuizReq req) {
-    virtualThreadExecutor.submit(
-        () -> {
-          Quizzes quiz =
-              quizRepository
-                  .findById(req.quizId())
-                  .orElseThrow(() -> new NoSuchElementException(QUIZ_NOT_FOUND.getCode()));
+    CompletableFuture<Quizzes> quizFuture = CompletableFuture.supplyAsync(
+            () -> quizRepository.findById(req.quizId())
+                    .orElseThrow(() -> new NoSuchElementException(QUIZ_NOT_FOUND.getCode())),
+            virtualThreadExecutor
+    );
 
-          Users user =
-              userRepository
-                  .findById(req.userId())
-                  .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getCode()));
+    CompletableFuture<Users> userFuture = CompletableFuture.supplyAsync(
+            () -> userRepository.findById(req.userId())
+                    .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getCode())),
+            virtualThreadExecutor
+    );
 
-          setAnswer(user, quiz, req, checkAnswers(quiz, req));
-        });
+      Quizzes quiz = quizFuture.join();
+      Users user = userFuture.join();
+      setAnswer(user, quiz, req, checkAnswers(quiz, req));
   }
 
   @Override
@@ -143,9 +146,14 @@ public class QuizServiceImpl implements QuizService {
     List<QuizzesResults> results =
         quizzesResults.getAllByUserIdAndQuizzeId(user.getId(), selectedQuizId);
 
-    long countCorrects = results.stream().filter(QuizzesResults::getIsCorrect).count();
+    int totalScore = results.stream()
+            .filter(QuizzesResults::getIsCorrect)
+            .mapToInt(result -> result.getQuizzes().getScore())
+            .sum();
 
-    return quizzeMapper.mapToRes(user, grammarTopicId, (int) countCorrects);
+    int scorePerQuiz = results.get(0).getQuizzes().getScore();
+    int correctAnswersCount = totalScore / scorePerQuiz;
+    return quizzeMapper.mapToRes(user, grammarTopicId, totalScore, correctAnswersCount);
   }
 
   private void setAnswer(Users user, Quizzes quiz, AnswerQuizReq req, boolean isCorrect) {
