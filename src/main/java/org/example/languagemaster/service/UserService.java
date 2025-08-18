@@ -4,6 +4,7 @@ import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.UserProfileRes;
 import org.example.languagemaster.dto.UserProgressRes;
 import org.example.languagemaster.dto.UserRankingRes;
+import org.example.languagemaster.dto.UserRankingResDtop;
 import org.example.languagemaster.entity.Levels;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public interface UserService {
 
   ResponseEntity<Response> levelUp(Long userId, Levels nextLevel);
 
-  ResponseEntity<Page<UserRankingRes>> ranking(
-      LocalDate begin, LocalDate end, String orderField, String orderType, int page, int size);
+  ResponseEntity<Page<UserRankingResDtop>> ranking(
+      LocalDate begin, LocalDate end, int page, int size);
 
   ResponseEntity<UserRankingRes> rankByUserId(Long userId);
 }

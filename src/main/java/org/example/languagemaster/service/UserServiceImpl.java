@@ -5,14 +5,13 @@ import static org.example.languagemaster.constraint.ApplicationMessages.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.example.languagemaster.Response;
-import org.example.languagemaster.dto.Ranking;
-import org.example.languagemaster.dto.UserProfileRes;
-import org.example.languagemaster.dto.UserProgressRes;
-import org.example.languagemaster.dto.UserRankingRes;
+import org.example.languagemaster.dto.*;
 import org.example.languagemaster.dto.mappers.UserMapper;
 import org.example.languagemaster.entity.Levels;
 import org.example.languagemaster.entity.Users;
@@ -20,6 +19,9 @@ import org.example.languagemaster.exceptionHandler.ApplicationException;
 import org.example.languagemaster.repository.UserProgressRepository;
 import org.example.languagemaster.repository.UserRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -96,9 +98,20 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public ResponseEntity<Page<UserRankingRes>> ranking(
-      LocalDate begin, LocalDate end, String orderField, String orderType, int page, int size) {
-    return null;
+  public ResponseEntity<Page<UserRankingResDtop>> ranking(
+      LocalDate begin, LocalDate end, int page, int size) {
+
+    Sort sort = Sort.by(Sort.Direction.DESC, "total_score");
+
+    Pageable pageable = PageRequest.of(page, size, sort);
+
+
+    LocalDateTime startOfDay = begin.atStartOfDay();
+    LocalDateTime endOfDay = end.atTime(LocalTime.MAX);
+
+    Page<UserRankingResDtop> rankings = userRepository.allRanking(startOfDay, endOfDay, pageable);
+
+    return ResponseEntity.ok(rankings);
   }
 
   @Override

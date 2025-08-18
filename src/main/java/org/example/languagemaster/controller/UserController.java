@@ -6,6 +6,7 @@ import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.UserProfileRes;
 import org.example.languagemaster.dto.UserProgressRes;
 import org.example.languagemaster.dto.UserRankingRes;
+import org.example.languagemaster.dto.UserRankingResDtop;
 import org.example.languagemaster.entity.UserProgress;
 import org.example.languagemaster.service.UserService;
 import org.springframework.data.domain.Page;
@@ -56,14 +57,12 @@ public class UserController {
   }
 
   @GetMapping("/ranking")
-  public ResponseEntity<Page<UserRankingRes>> userRanking(
+  public ResponseEntity<Page<UserRankingResDtop>> userRanking(
           @RequestParam LocalDate begin,
           @RequestParam LocalDate end,
           @RequestParam int page,
-          @RequestParam int size,
-          @RequestParam String orderField,
-          @RequestParam String orderType){
-    return userService.ranking(begin, end, orderField, orderType, page, size);
+          @RequestParam int size){
+    return userService.ranking(begin, end, page, size);
   }
 
   @GetMapping("/rank/{userId}")
