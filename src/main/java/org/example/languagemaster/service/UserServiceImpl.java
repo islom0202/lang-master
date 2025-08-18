@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.example.languagemaster.Response;
+import org.example.languagemaster.dto.Ranking;
 import org.example.languagemaster.dto.UserProfileRes;
 import org.example.languagemaster.dto.UserProgressRes;
 import org.example.languagemaster.dto.UserRankingRes;
@@ -102,6 +103,20 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public ResponseEntity<UserRankingRes> rankByUserId(Long userId) {
-    return null;
+    Ranking rank = userRepository.getRanking(userId);
+    Users user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new NoSuchElementException(USER_NOT_FOUND.getCode()));
+
+    return ResponseEntity.ok(
+        UserRankingRes.builder()
+            .userId(userId)
+            .firstname(user.getFirstname())
+            .lastname(user.getLastname())
+            .level(user.getLangLevel().getLevel())
+            .totalScore(rank.getTotalScore())
+            .lessons(rank.getTotalLessons())
+            .build());
   }
 }
