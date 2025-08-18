@@ -18,6 +18,6 @@ public class Util {
     public static String buildImageUrl(Users user){
         if (user.getImage() == null)
             return "";
-        return baseUrl+"/api/user/profile-image/" + user.getId();
+        return "/api/user/profile-image/" + user.getId();
     }
 }

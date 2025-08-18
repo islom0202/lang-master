@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  @Transactional
+//  @Transactional
   public ResponseEntity<Response> signUp(SignUpRequest request) {
     String key = request.email();
 
@@ -83,7 +83,7 @@ public class AuthServiceImpl implements AuthService {
   private ResponseEntity<Response> checkUserIfExist(String userEmail) {
     String code = generateCode();
 
-    if (userRepository.existsByEmail(userEmail) && userRepository.isVerified(userEmail)) {
+    if (userRepository.existsByEmail(userEmail) && !userRepository.isVerified(userEmail)) {
       String otp = cache.get(USER_TABLE, userEmail, new TypeReference<String>() {});
       if (Objects.isNull(otp)) {
         email.sendConfirmationCode(userEmail, code);

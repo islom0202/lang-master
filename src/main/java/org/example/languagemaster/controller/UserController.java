@@ -41,11 +41,11 @@ public class UserController {
     return userService.profileImage(userId);
   }
 
-  @PostMapping("/upload-image")
+  @PostMapping("/upload-image/{userId}")
   @Operation(
           summary = "Upload image for profile")
   public ResponseEntity<Response> uploadImage(
-      @RequestParam("userId") Long userId, @RequestParam("file") MultipartFile file) {
+      @PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) {
       return userService.uploadImage(userId, file);
   }
 
