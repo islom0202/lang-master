@@ -50,7 +50,7 @@ public class QuizzeMapper {
     return Quizzes.builder()
         .sectionId(topicId)
         .score(score)
-        .sectionType(SectionType.GRAMMAR)
+        .sectionType(type)
         .type(req.getType())
         .question(req.getQuestion())
         .correctAnswers(req.getCorrectAnswers())

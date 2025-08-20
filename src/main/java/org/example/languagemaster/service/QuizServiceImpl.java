@@ -109,7 +109,7 @@ public class QuizServiceImpl implements QuizService {
 
   @Override
   public ResponseEntity<Response> addVocabQuiz(Long groupId, Long score, List<QuizReq> req) {
-    return buildQuiz(groupId, score, req, SectionType.GRAMMAR);
+    return buildQuiz(groupId, score, req, SectionType.VOCABULARY);
   }
 
   @Override

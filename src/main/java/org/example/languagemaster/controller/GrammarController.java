@@ -65,4 +65,9 @@ public class GrammarController {
         return grammarService.topicList();
     }
 
+    @GetMapping("/lesson/{id}")
+    public ResponseEntity<GrammarRes> lesson(
+            @PathVariable("id") Long id){
+        return grammarService.lesson(id);
+    }
 }

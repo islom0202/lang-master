@@ -34,21 +34,21 @@ public class UserController {
     return userService.userProfile(userId);
   }
 
-  @GetMapping("/profile-image/{userId}")
-  @Operation(
-          summary = "Get profile image",
-          description = "Returns profile image as byte[]")
-  public ResponseEntity<byte[]> profileImage(@PathVariable("userId") Long userId) {
-    return userService.profileImage(userId);
-  }
+//  @GetMapping("/profile-image/{userId}")
+//  @Operation(
+//          summary = "Get profile image",
+//          description = "Returns profile image as byte[]")
+//  public ResponseEntity<byte[]> profileImage(@PathVariable("userId") Long userId) {
+//    return userService.profileImage(userId);
+//  }
 
-  @PostMapping("/upload-image/{userId}")
-  @Operation(
-          summary = "Upload image for profile")
-  public ResponseEntity<Response> uploadImage(
-      @PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) {
-      return userService.uploadImage(userId, file);
-  }
+//  @PostMapping("/upload-image/{userId}")
+//  @Operation(
+//          summary = "Upload image for profile")
+//  public ResponseEntity<Response> uploadImage(
+//      @PathVariable("userId") Long userId, @RequestParam("file") MultipartFile file) {
+//      return userService.uploadImage(userId, file);
+//  }
 
   @GetMapping("/progress")
   public ResponseEntity<List<UserProgressRes>> userProgress(

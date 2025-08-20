@@ -104,4 +104,12 @@ public class GrammarServiceImpl implements GrammarService {
   public ResponseEntity<List<TopicRes>> topicList() {
     return ResponseEntity.ok(grammarRepository.getTopicList());
   }
+
+  @Override
+  public ResponseEntity<GrammarRes> lesson(Long id) {
+    GrammarTopics topic =
+        grammarRepository.findById(id).orElseThrow(() -> new NoSuchElementException("topic not found"));
+
+    return ResponseEntity.ok(grammarMapper.mapToGrammarRes(topic));
+  }
 }

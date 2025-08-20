@@ -16,9 +16,9 @@ import java.util.List;
 public interface UserService {
   ResponseEntity<UserProfileRes> userProfile(Long userId);
 
-  ResponseEntity<byte[]> profileImage(Long userId);
-
-  ResponseEntity<Response> uploadImage(Long userId, MultipartFile file);
+//  ResponseEntity<byte[]> profileImage(Long userId);
+//
+//  ResponseEntity<Response> uploadImage(Long userId, MultipartFile file);
 
   ResponseEntity<List<UserProgressRes>> userProgress(Long userId);
 

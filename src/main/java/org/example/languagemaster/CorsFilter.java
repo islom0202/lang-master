@@ -14,6 +14,7 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter{
     private static final List<String> ALLOWED_ORIGINS = Arrays.asList(
+            "https://desired-fit-parakeet.ngrok-free.app",
             "http://16.170.158.74:8081",
             "http://localhost:3000",
             "http://localhost:9000",

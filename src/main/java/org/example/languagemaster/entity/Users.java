@@ -25,10 +25,6 @@ public class Users implements Serializable {
   @Column private String lastname;
   @Column private String password;
   @Column private String email;
-  @JoinColumn
-  @Lob
-  private byte[] image;
-
   @Enumerated(EnumType.STRING)
   @Column
   private UserRole role;

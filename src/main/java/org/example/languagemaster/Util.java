@@ -15,9 +15,9 @@ public class Util {
         int code = 1000 + random.nextInt(9000);
         return String.valueOf(code);
     }
-    public static String buildImageUrl(Users user){
-        if (user.getImage() == null)
-            return "";
-        return "/api/user/profile-image/" + user.getId();
-    }
+//    public static String buildImageUrl(Users user){
+//        if (user.getImage() == null)
+//            return "";
+//        return "/api/user/profile-image/" + user.getId();
+//    }
 }

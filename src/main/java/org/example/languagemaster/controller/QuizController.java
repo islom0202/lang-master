@@ -56,6 +56,7 @@ public class QuizController {
     public void answerVocabQuiz(@RequestBody AnswerQuizReq req){
         quizService.answerVocabQuiz(req);
     }
+
     @GetMapping("/grammar-result")
     @Operation(
             summary = "Get quizzes result",
