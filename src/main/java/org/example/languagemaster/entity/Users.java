@@ -33,7 +33,7 @@ public class Users implements Serializable {
   @Column
   private UserRole role;
   @JoinColumn
-  @OneToOne
+  @ManyToOne
   private Levels langLevel;
   @Column private boolean isVerified;
   @Column private LocalDateTime createdAt;
