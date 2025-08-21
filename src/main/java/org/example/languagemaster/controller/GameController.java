@@ -2,6 +2,7 @@ package org.example.languagemaster.controller;
 
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
+import org.example.languagemaster.dto.FinalGameRes;
 import org.example.languagemaster.dto.GameAnswers;
 import org.example.languagemaster.dto.GameResult;
 import org.example.languagemaster.entity.Games;
@@ -23,11 +24,15 @@ public class GameController {
     }
 
     @PostMapping("/cache-answers")
-    public void collectAnswers(
+    public ResponseEntity<GameResult> collectAnswers(
             @RequestBody GameAnswers answers){
-        gameService.cacheAnswers(answers);
+       return gameService.answers(answers);
     }
 
-//    @PostMapping("/finish")
-//    public ResponseEntity<GameResult>
+    @GetMapping("/finish/{userId}")
+    public ResponseEntity<FinalGameRes> finalResponse(
+            @PathVariable("userId") Long userId){
+        return gameService.finalResponse(userId);
+    }
+
 }
