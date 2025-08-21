@@ -30,7 +30,7 @@ public class UserProgress implements Serializable {
     @Column
     private Long sectionId;  // qaysi topic yoki vocabulary group bolsa shuni id si
     @Column
-    private int score;
+    private int score;  // game uchun har biriga 1 balldan beriladi
     @Column
     private LocalDateTime completedAt;
     @Column
