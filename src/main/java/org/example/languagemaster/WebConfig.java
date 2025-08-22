@@ -18,7 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:3000",
                         "http://localhost:9000",
                         "http://localhost:50792")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")   // 🔑 muhim
+                .exposedHeaders("Authorization") // agar token qaytarsang
                 .allowCredentials(true);
     }
 
