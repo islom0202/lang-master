@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-//  @Transactional
+  @Transactional
   public ResponseEntity<Response> signUp(SignUpRequest request) {
     String key = request.email();
 
