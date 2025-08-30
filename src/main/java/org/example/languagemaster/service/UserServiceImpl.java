@@ -2,22 +2,17 @@ package org.example.languagemaster.service;
 
 import static org.example.languagemaster.constraint.ApplicationMessages.*;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-
-
 import lombok.RequiredArgsConstructor;
 import org.example.languagemaster.Response;
 import org.example.languagemaster.dto.*;
 import org.example.languagemaster.dto.mappers.UserMapper;
 import org.example.languagemaster.entity.Levels;
 import org.example.languagemaster.entity.Users;
-import org.example.languagemaster.exceptionHandler.ApplicationException;
 import org.example.languagemaster.repository.UserProgressRepository;
 import org.example.languagemaster.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -25,11 +20,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -143,5 +135,11 @@ public class UserServiceImpl implements UserService {
             .totalScore(rank.getTotalScore())
             .lessons(rank.getTotalLessons())
             .build());
+  }
+
+  @Override
+  public ResponseEntity<String> delete(Long userId) {
+    userRepository.deleteById(userId);
+    return ResponseEntity.ok("deleted");
   }
 }

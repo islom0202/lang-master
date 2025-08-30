@@ -70,4 +70,11 @@ public class UserController {
           @PathVariable("userId") Long userId){
     return userService.rankByUserId(userId);
   }
+
+  @DeleteMapping("/delete/{userId}")
+  @Operation(summary = "(FOR ADMIN)")
+  public ResponseEntity<String> delete(
+          @PathVariable("userId") Long userId){
+    return userService.delete(userId);
+  }
 }

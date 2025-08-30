@@ -23,4 +23,6 @@ public interface GrammarService {
     ResponseEntity<List<TopicRes>> topicList();
 
     ResponseEntity<GrammarRes> lesson(Long id);
+
+    ResponseEntity<String> delete(Long topicId);
 }

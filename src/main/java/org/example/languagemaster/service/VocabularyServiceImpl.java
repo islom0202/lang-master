@@ -104,4 +104,10 @@ public class VocabularyServiceImpl implements VocabularyService {
     wordsRepository.saveAll(wordsList);
     return ResponseEntity.ok(new Response("saved", true));
   }
+
+  @Override
+  public ResponseEntity<String> deleteWord(String word) {
+    wordsRepository.deleteByWord(word);
+    return ResponseEntity.ok("deleted");
+  }
 }

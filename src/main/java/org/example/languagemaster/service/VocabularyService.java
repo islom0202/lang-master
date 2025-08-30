@@ -17,4 +17,6 @@ public interface VocabularyService {
     ResponseEntity<Response> addCategories(List<VocabularyGroupsReq> categories);
 
     ResponseEntity<Response> addWords(Long categoryId, List<WordsReq> words);
+
+    ResponseEntity<String> deleteWord(String word);
 }

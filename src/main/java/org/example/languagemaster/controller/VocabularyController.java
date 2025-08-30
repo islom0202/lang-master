@@ -40,15 +40,24 @@ public class VocabularyController {
     }
 
     @PostMapping("/add-categories")
+    @Operation(summary = "(FOR ADMIN)")
     public ResponseEntity<Response> addCategories(
             @RequestBody List<VocabularyGroupsReq> categories){
         return vocabularyService.addCategories(categories);
     }
 
   @PostMapping("/add-words/{categoryId}")
+  @Operation(summary = "(FOR ADMIN)")
   public ResponseEntity<Response> addWords(
           @PathVariable("categoryId") Long categoryId,
           @RequestBody List<WordsReq> words) {
         return vocabularyService.addWords(categoryId, words);
+    }
+
+    @DeleteMapping("/delete/{word}")
+    @Operation(summary = "(FOR ADMIN)")
+    public ResponseEntity<String> deleteWord(
+            @PathVariable("word") String word){
+        return vocabularyService.deleteWord(word);
     }
 }

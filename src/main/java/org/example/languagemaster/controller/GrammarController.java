@@ -55,6 +55,7 @@ public class GrammarController {
     }
 
     @PostMapping("/add-list")
+    @Operation(summary = "(FOR ADMIN)")
     public ResponseEntity<Response> addList(
             @RequestBody List<GrammarReq> request){
         return grammarService.addList(request);
@@ -69,5 +70,12 @@ public class GrammarController {
     public ResponseEntity<GrammarRes> lesson(
             @PathVariable("id") Long id){
         return grammarService.lesson(id);
+    }
+
+    @DeleteMapping("/delete/{topicId}")
+    @Operation(summary = "(FOR ADMIN)")
+    public ResponseEntity<String> delete(
+            @PathVariable("topicId") Long topicId){
+        return grammarService.delete(topicId);
     }
 }

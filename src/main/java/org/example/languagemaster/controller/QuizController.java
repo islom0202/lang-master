@@ -68,6 +68,7 @@ public class QuizController {
     }
 
     @PostMapping("/add-grammar/{topicId}/{score}")
+    @Operation(summary = "(FOR ADMIN)")
     public ResponseEntity<Response> addGrammarQuiz(
             @PathVariable("topicId") Long topicId,
             @PathVariable("score") Long score,
@@ -76,10 +77,18 @@ public class QuizController {
     }
 
     @PostMapping("/add-vocab/{groupId}/{score}")
+    @Operation(summary = "(FOR ADMIN)")
     public ResponseEntity<Response> addVocabQuiz(
             @PathVariable("groupId") Long groupId,
             @PathVariable("score") Long score,
             @RequestBody List<QuizReq> req){
         return quizService.addVocabQuiz(groupId, score, req);
+    }
+
+    @DeleteMapping("/delete/{quizId}")
+    @Operation(summary = "(FOR ADMIN)")
+    public ResponseEntity<String> delete(
+            @PathVariable("quizId") Long quizId){
+        return quizService.delete(quizId);
     }
 }

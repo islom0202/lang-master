@@ -117,6 +117,12 @@ public class QuizServiceImpl implements QuizService {
     answerQuiz(req);
   }
 
+  @Override
+  public ResponseEntity<String> delete(Long quizId) {
+    quizRepository.deleteById(quizId);
+    return ResponseEntity.ok("deleted");
+  }
+
   private void answerQuiz(AnswerQuizReq req){
     CompletableFuture<Quizzes> quizFuture = CompletableFuture.supplyAsync(
             () -> quizRepository.findById(req.quizId())

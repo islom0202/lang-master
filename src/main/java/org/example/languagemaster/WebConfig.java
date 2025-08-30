@@ -18,15 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:3000",
                         "http://localhost:9000",
                         "http://localhost:50792")
-                .allowedHeaders("*")   // 🔑 muhim
-                .exposedHeaders("Authorization") // agar token qaytarsang
+                .allowedHeaders("*")
+                .exposedHeaders("Authorization")
                 .allowCredentials(true);
     }
-
-
-//    @Override
-//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        registry.addResourceHandler("/**", "/webjars/**")
-//                .addResourceLocations("classpath:/static/", "classpath:/META-INF/resources/webjars/");
-//    }
 }

@@ -28,4 +28,6 @@ public interface UserService {
       LocalDate begin, LocalDate end, int page, int size);
 
   ResponseEntity<UserRankingRes> rankByUserId(Long userId);
+
+    ResponseEntity<String> delete(Long userId);
 }

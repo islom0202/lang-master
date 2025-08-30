@@ -22,4 +22,6 @@ public interface QuizService {
     ResponseEntity<Response> addVocabQuiz(Long groupId, Long score, List<QuizReq> req);
 
     void answerVocabQuiz(AnswerQuizReq req);
+
+    ResponseEntity<String> delete(Long quizId);
 }

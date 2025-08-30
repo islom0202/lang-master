@@ -1,6 +1,8 @@
 package org.example.languagemaster.controller;
 
 import java.util.List;
+
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.example.languagemaster.Response;
 import org.example.languagemaster.entity.Levels;
@@ -19,6 +21,7 @@ public class LevelController {
   private final UserService userService;
 
   @PostMapping("/add")
+  @Operation(summary = "(FOR ADMIN)")
   public ResponseEntity<Response> addLevel(@RequestParam String level) {
     levelRepository.save(Levels.builder().level(level).build());
     return ResponseEntity.ok(new Response("saved", true));

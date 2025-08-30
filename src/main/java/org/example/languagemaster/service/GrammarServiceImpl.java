@@ -112,4 +112,10 @@ public class GrammarServiceImpl implements GrammarService {
 
     return ResponseEntity.ok(grammarMapper.mapToGrammarRes(topic));
   }
+
+  @Override
+  public ResponseEntity<String> delete(Long topicId) {
+    grammarRepository.deleteById(topicId);
+    return ResponseEntity.ok("deleted");
+  }
 }
