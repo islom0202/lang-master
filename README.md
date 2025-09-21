@@ -1,6 +1,6 @@
-# Lang-Master 📘✨
+# Linguaway 📘✨
 
-**Lang-Master** is a full-featured **language learning platform** built with **Spring Boot 3.5.4** and **Java 21**.  
+**Linguaway** is a full-featured **language learning platform** built with **Spring Boot 3.5.4** and **Java 21**.  
 It combines grammar lessons, video tutorials, vocabulary building, quizzes, and gamified exercises to make learning languages engaging and effective.  
 With PostgreSQL for persistence, Redis for caching, and JWT-based security, the platform is both **scalable** and **secure**.
 
@@ -35,37 +35,37 @@ With PostgreSQL for persistence, Redis for caching, and JWT-based security, the 
     - ZXing (QR code generation)
 
 * Home page short described the platform
-![Lang-Master Dashboard](assets/home-page.png)
+![Linguaway Dashboard](assets/home-page.png)
 
 * Grammars page including all available lessons here
-![Lang-Master Dashboard](assets/grammar-category.png)
+![Linguaway Dashboard](assets/grammar-category.png)
 
 * Video lesson page
-  ![Lang-Master Dashboard](assets/video-lesson.png)
+  ![Linguaway Dashboard](assets/video-lesson.png)
 
 * Video lesson page
-  ![Lang-Master Dashboard](assets/lesson.png)
+  ![Linguaway Dashboard](assets/lesson.png)
 
 * Game page
-  ![Lang-Master Dashboard](assets/game1.png)
+  ![Linguaway Dashboard](assets/game1.png)
 
 * Vocabulary page
-  ![Lang-Master Dashboard](assets/vocabulary.png)
+  ![Linguaway Dashboard](assets/vocabulary.png)
 
 * User achievement tracking page
-  ![Lang-Master Dashboard](assets/achievements.png)
+  ![Linguaway Dashboard](assets/achievements.png)
 
 * User progress page
-  ![Lang-Master Dashboard](assets/progress.png)
+  ![Linguaway Dashboard](assets/progress.png)
 
 * Backend swagger-document
-  ![Lang-Master Dashboard](assets/swagger-doc.png)
-  ![Lang-Master Dashboard](assets/swagger-doc-next.png)
+  ![Linguaway swagger document](assets/swagger-doc.png)
+  ![Linguaway swagger document](assets/swagger-doc-next.png)
 
 
 ## 🌐 Live Demo
 
-You can try the project here: [Lang Master Website](https://linguaway.uz)
+You can try the project here: [Linguaway Website](https://linguaway.uz)
 ---
 
 ## ⚙️ Getting Started
@@ -78,7 +78,7 @@ You can try the project here: [Lang Master Website](https://linguaway.uz)
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/islom0202/lang-master.git
+git clone https://github.com/islom0202/linguaway.backend.git
 cd lang-master
 
 # Build the project
@@ -91,4 +91,4 @@ cd lang-master
 ## 📂 Project Repository
 
 Projectni shu yerda topishingiz mumkin:  
-👉 [Lang Master GitHub Repository](https://github.com/islom0202/lang-master)
+👉 [Lang Master GitHub Repository](https://github.com/islom0202/linguaway.backend)
