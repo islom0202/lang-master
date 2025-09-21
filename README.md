@@ -65,7 +65,7 @@ With PostgreSQL for persistence, Redis for caching, and JWT-based security, the 
 
 ## 🌐 Live Demo
 
-You can try the project here: [Lang Master Website](https://learn-english-with-us.netlify.app)
+You can try the project here: [Lang Master Website](https://linguaway.uz)
 ---
 
 ## ⚙️ Getting Started
