@@ -11,13 +11,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns(
-                        "https://desired-fit-parakeet.ngrok-free.app",
-                        "https://learn-english-with-us.netlify.app",
-                        "https://learn-english.prime-core.uz",
-                        "http://16.170.158.74:8081",
-                        "http://localhost:3000",
-                        "http://localhost:9000",
-                        "http://localhost:50792")
+                "https://linguaway.uz",
+                "https://api.linguaway.uz")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
                 .allowCredentials(true);
