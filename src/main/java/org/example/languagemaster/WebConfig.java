@@ -12,6 +12,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOriginPatterns(
                 "https://linguaway.uz",
+                "https://www.linguaway.uz",
+                "https://learnenglish-sd1s.onrender.com",
                 "https://api.linguaway.uz")
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
